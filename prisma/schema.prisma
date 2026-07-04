@@ -9,6 +9,7 @@ generator client {
 
 datasource db {
   provider = "postgresql"
+  
  
 }
 
@@ -18,24 +19,22 @@ enum Role {
   ADMIN
 }
 
+
 model User {
-  id            String         @id @default(cuid())
-  name          String
-  email         String         @unique
-  password      String
-  role          Role           @default(USER)
-  createdAt     DateTime       @default(now())
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+
+  role      Role     @default(USER)
+
+  createdAt DateTime @default(now())
 
   events        Event[]
   registrations Registration[]
 }
 
-model Category {
-  id     String  @id @default(cuid())
-  name   String  @unique
 
-  events Event[]
-}
 
 model Event {
   id          String   @id @default(cuid())
@@ -48,10 +47,8 @@ model Event {
   createdAt   DateTime @default(now())
 
   organizerId String
-  categoryId  String
 
-  organizer   User     @relation(fields: [organizerId], references: [id])
-  category    Category @relation(fields: [categoryId], references: [id])
+  organizer   User @relation(fields: [organizerId], references: [id])
 
   registrations Registration[]
 }
