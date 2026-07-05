@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 
 type EventCardProps = {
@@ -7,6 +8,7 @@ type EventCardProps = {
     description: string;
     location: string;
     date: Date;
+    imageUrl: string | null;
     organizer: {
       name: string;
     };
@@ -20,8 +22,18 @@ export default function EventCard({
 }: EventCardProps) {
   return (
     <article className="group overflow-hidden rounded-3xl border border-white/10 bg-card transition-all duration-300 hover:-translate-y-2 hover:border-primary hover:shadow-2xl hover:shadow-primary/20">
-      {/* Top Gradient */}
-      <div className="h-1 w-full bg-gradient-to-r from-violet-500 via-fuchsia-500 to-cyan-500" />
+      {event.imageUrl && (
+        <div className="relative h-56 w-full overflow-hidden">
+          <Image
+            src={event.imageUrl}
+            alt={event.title}
+            fill
+            className="object-cover transition duration-500 group-hover:scale-105"
+          />
+        </div>
+      )}
+
+      <div className="h-1 w-full bg-linear-to-r from-violet-500 via-fuchsia-500 to-cyan-500" />
 
       <div className="p-7">
         <p className="text-xs font-semibold uppercase tracking-[0.3em] text-primary">

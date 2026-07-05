@@ -25,3 +25,38 @@ export async function getRegistration(
     },
   });
 }
+
+export async function isRegistered(
+  userId: string,
+  eventId: string
+) {
+  return prisma.registration.findUnique({
+    where: {
+      userId_eventId: {
+        userId,
+        eventId,
+      },
+    },
+    select: {
+      id: true,
+    },
+  });
+}
+
+export async function getRegisteredEvents(userId: string) {
+  return prisma.registration.findMany({
+    where: {
+      userId,
+    },
+    include: {
+      event: {
+        include: {
+          organizer: true,
+        },
+      },
+    },
+    orderBy: {
+      createdAt: "desc",
+    },
+  });
+}

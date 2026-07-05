@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 
+import cloudinary from "@/lib/cloudinary";
 import * as eventService from "@/services/event.service";
 
 type TokenPayload = {
@@ -17,7 +18,46 @@ export async function createEvent(formData: FormData) {
   const description = formData.get("description") as string;
   const location = formData.get("location") as string;
   const date = new Date(formData.get("date") as string);
-  const imageUrl = formData.get("imageUrl") as string;
+
+  const image = formData.get("image") as File;
+
+  let imageUrl = "";
+
+  if (image && image.size > 0) {
+  console.log("Image name:", image.name);
+  console.log("Image size:", image.size);
+  console.log("Cloud Name:", process.env.CLOUDINARY_CLOUD_NAME);
+
+  const bytes = await image.arrayBuffer();
+  const buffer = Buffer.from(bytes);
+
+  try {
+    const result: any = await new Promise((resolve, reject) => {
+      cloudinary.uploader
+        .upload_stream(
+          {
+            folder: "eventhub",
+          },
+          (error, result) => {
+            if (error) {
+              console.error("Cloudinary Upload Error:", error);
+              reject(error);
+            } else {
+              resolve(result);
+            }
+          }
+        )
+        .end(buffer);
+    });
+
+    console.log("Upload Success:", result);
+
+    imageUrl = result.secure_url;
+  } catch (err) {
+    console.error("Upload Failed:", err);
+    throw err;
+  }
+}
 
   const cookieStore = await cookies();
   const token = cookieStore.get("token")?.value;
@@ -56,17 +96,47 @@ export async function deleteEvent(formData: FormData) {
 }
 
 export async function updateEvent(formData: FormData) {
-  const id = formData.get("id") as string;
+  try {
+    const id = formData.get("id") as string;
 
-  await eventService.updateEvent(id, {
-    title: formData.get("title") as string,
-    description: formData.get("description") as string,
-    location: formData.get("location") as string,
-    date: new Date(formData.get("date") as string),
-    imageUrl: formData.get("imageUrl") as string,
-  });
+    const image = formData.get("image") as File;
 
-  revalidatePath("/dashboard");
+    let imageUrl: string | undefined;
 
-  redirect("/dashboard");
+    if (image && image.size > 0) {
+      const bytes = await image.arrayBuffer();
+
+      const base64 = `data:${image.type};base64,${Buffer.from(bytes).toString(
+        "base64"
+      )}`;
+
+      console.log("Cloudinary config:", cloudinary.config());
+
+      const result = await cloudinary.uploader.upload(base64, {
+        folder: "eventhub",
+      });
+
+      console.log("Upload Success:", result.secure_url);
+
+      imageUrl = result.secure_url;
+    }
+
+    await eventService.updateEvent(id, {
+      title: formData.get("title") as string,
+      description: formData.get("description") as string,
+      location: formData.get("location") as string,
+      date: new Date(formData.get("date") as string),
+      imageUrl,
+    });
+
+    revalidatePath("/dashboard");
+    revalidatePath("/events");
+    revalidatePath(`/events/${id}`);
+
+    redirect("/dashboard");
+  } catch (error) {
+    console.error("UPDATE EVENT ERROR:");
+    console.error(error);
+    throw error;
+  }
 }

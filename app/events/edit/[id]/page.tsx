@@ -100,13 +100,14 @@ export default async function EditEventPage({ params }: Props) {
 
           <div>
             <label className="mb-2 block text-sm">
-              Image URL
+              Replace Image (optional)
             </label>
 
             <input
-              name="imageUrl"
-              defaultValue={event.imageUrl ?? ""}
-              className="w-full rounded-xl border border-white/10 bg-background px-4 py-3 outline-none transition focus:border-primary"
+              type="file"
+              name="image"
+              accept="image/*"
+              className="w-full rounded-xl border border-white/10 bg-background px-4 py-3 file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-white"
             />
           </div>
 

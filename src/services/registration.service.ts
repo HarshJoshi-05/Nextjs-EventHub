@@ -11,11 +11,32 @@ export async function registerForEvent(
     );
 
   if (existing) {
-    throw new Error("Already registered");
+    return {
+      success: false,
+      message: "Already registered",
+    };
   }
 
-  return registrationRepository.createRegistration(
+  await registrationRepository.createRegistration(
     userId,
     eventId
   );
+
+  return {
+    success: true,
+  };
+}
+
+export async function isRegistered(
+  userId: string,
+  eventId: string
+) {
+  return registrationRepository.isRegistered(
+    userId,
+    eventId
+  );
+}
+
+export async function getRegisteredEvents(userId: string) {
+  return registrationRepository.getRegisteredEvents(userId);
 }

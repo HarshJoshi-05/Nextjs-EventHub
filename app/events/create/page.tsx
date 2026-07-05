@@ -16,7 +16,10 @@ export default function CreateEventPage() {
           Fill in the details below to publish your event.
         </p>
 
-        <form action={createEvent} className="mt-8 space-y-6">
+        <form
+          action={createEvent}
+          className="mt-8 space-y-6"
+        >
           <div>
             <label className="mb-2 block text-sm">
               Event Title
@@ -68,22 +71,23 @@ export default function CreateEventPage() {
               <input
                 type="datetime-local"
                 name="date"
-                className="w-full rounded-xl border border-white/10 bg-background px-4 py-3 outline-none transition focus:border-primary"
                 required
+                className=" w-full rounded-xl border border-white/10 bg-background px-4 py-3 text-white outline-none transition focus:border-primary
+                 focus:ring-2  focus:ring-primary/30 scheme-dark"
               />
             </div>
           </div>
 
           <div>
             <label className="mb-2 block text-sm">
-              Image URL
+              Event Image
             </label>
 
             <input
-              type="text"
-              name="imageUrl"
-              placeholder="https://..."
-              className="w-full rounded-xl border border-white/10 bg-background px-4 py-3 outline-none transition focus:border-primary"
+              type="file"
+              name="image"
+              accept="image/*"
+              className="w-full rounded-xl border border-white/10 bg-background px-4 py-3 file:mr-4 file:rounded-lg file:border-0 file:bg-primary file:px-4 file:py-2 file:text-white"
             />
           </div>
 
